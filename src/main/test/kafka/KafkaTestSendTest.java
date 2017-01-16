@@ -13,12 +13,12 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @ContextConfiguration(classes = {WebAppConfig.class})
 @RunWith(SpringJUnit4ClassRunner.class)
 public class KafkaTestSendTest {
-  @Autowired
-  KafkaProducer kafkaProducer;
+//  @Autowired
+//  KafkaProducer kafkaProducer;
 
   @Test
   public void check() throws Exception {
-    kafkaProducer.sendJson("test", 0, "rrrrrrr");
-    Thread.sleep(2000);
+//    kafkaProducer.sendJson("test", 0, "rrrrrrr");
+//    Thread.sleep(2000);
   }
 }

@@ -60,14 +60,6 @@
             <version>${spring-core.version}</version>
         </dependency>
 
-        <!--Kafka spring-->
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-            <version>1.0.1.RELEASE</version>
-        </dependency>
-        <!--Kafka spring-->
-
         <!--Kafka apache api-->
         <dependency>
             <groupId>org.apache.kafka</groupId>

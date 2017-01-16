@@ -8,9 +8,6 @@ import kafka.util.LogMessage;
 import lombok.extern.log4j.Log4j;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.ProducerListener;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
@@ -20,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 @Component
 @Log4j
 public class KafkaProducer {
-  @Autowired
+  /*@Autowired
   protected KafkaTemplate<Integer, String> kafkaTemplate;
 
   public String sendJson(String topic, int partition, Object object) throws JsonProcessingException, InterruptedException, ExecutionException {
@@ -58,6 +55,6 @@ public class KafkaProducer {
       }
     });
     return json;
-  }
+  }*/
 
 }
