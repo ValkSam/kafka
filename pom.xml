@@ -15,6 +15,7 @@
         <spring-beans.version>4.3.0.RELEASE</spring-beans.version>
         <spring-core.version>4.3.0.RELEASE</spring-core.version>
         <spring-context.version>4.3.0.RELEASE</spring-context.version>
+        <log4j2.version>2.6.2</log4j2.version>
     </properties>
     <dependencies>
         <dependency>
@@ -59,6 +60,115 @@
             <version>${spring-core.version}</version>
         </dependency>
 
+        <!--Kafka spring-->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>1.0.1.RELEASE</version>
+        </dependency>
+        <!--Kafka spring-->
+
+        <!--Kafka apache api-->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>0.10.1.1</version>
+        </dependency>
+        <!--Kafka apache api-->
+
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-1.2-api</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+        <!-- Logging -->
+
+        <!--Test-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring-core.version}</version>
+        </dependency>
+        <!--Test-->
+
+        <!--lombok-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--lombok-->
+
+        <!--Marshalling-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.7.1-1</version>
+        </dependency>
+        <!--Marshalling-->
+
+        <dependency>
+            <groupId>net.kaczmarzyk</groupId>
+            <artifactId>specification-arg-resolver</artifactId>
+            <version>0.9.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                    <artifactId>hibernate-jpa-2.0-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <version>1.0.0.Final</version>
+        </dependency>
+
+<!--        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-web</artifactId>
+            <version>2.6.2</version>
+            <scope>test</scope>
+        </dependency>-->
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
