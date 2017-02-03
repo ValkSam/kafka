@@ -1,6 +1,5 @@
 package kafka.kafkaListener;
 
-import kafka.kafkaListener.task.KafkaMessageProcessTask;
 import kafka.util.LogMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,29 +10,20 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Setter @Getter
 @Log4j
-public abstract class KafkaListener implements Runnable {
+public class KafkaListener implements Runnable {
   private String name;
-  private KafkaConsumer kafkaConsumer;
+  private KafkaConsumer<String, String> kafkaConsumer;
   private ThreadPoolTaskExecutor threadPoolExecutor;
 
   private String topic;
   private ConcurrentHashMap<String, Function<ConsumerRecord<String, String>, Boolean>> keyHandlerMap = new ConcurrentHashMap<>();
-
-  public abstract KafkaMessageProcessTask getKafkaMessageProcessTask(
-      ConsumerRecord<String, String> record,
-      String submittedByListenerName,
-      Function<ConsumerRecord<String, String>, Boolean> topicMappedMethodExecutor,
-      Consumer onSuccess,
-      Consumer onError);
 
   @Override
   public void run() {
@@ -45,20 +35,20 @@ public abstract class KafkaListener implements Runnable {
           log.debug(LogMessage.logMessage("kafka api get records by listener: " + name, records));
           for (ConsumerRecord<String, String> record : records) {
             String key = record.key();
-            Function topicMappedMethodExecutor = getTopicMappedMethodExecutor(key);
+            Function<ConsumerRecord<String, String>, Boolean> topicMappedMethodExecutor = getTopicMappedMethodExecutor(key);
             if (topicMappedMethodExecutor != null) {
               log.debug(LogMessage.logMessage("kafka api process record  by listener: " + name + " for key: " + key, record));
-              KafkaMessageProcessTask task = getKafkaMessageProcessTask(
-                  record,
-                  name,
-                  topicMappedMethodExecutor,
-                  (r)->{
-                    log.debug(LogMessage.logMessage("kafka on success callback fired by task for listener : " + name + " for key: " + key, record));
-                  },
-                  (r)->{
-                    log.error(LogMessage.logMessage("kafka on ERROR callback fired by task for listener : " + name + " for key: " + key, record));
+
+              CompletableFuture
+                  .supplyAsync(() -> topicMappedMethodExecutor.apply(record), threadPoolExecutor)
+                  .thenAccept((topicMappedMethodExecutorResult) -> {
+                    if ((Boolean) topicMappedMethodExecutorResult) {
+                      log.debug(LogMessage.logMessage("kafka on success callback fired by task for listener : " + name + " for key: " + key, record));
+                    } else {
+                      log.error(LogMessage.logMessage("kafka on ERROR callback fired by task for listener : " + name + " for key: " + key, record));
+                    }
                   });
-              threadPoolExecutor.submit(task);
+
             } else {
               log.debug(LogMessage.logMessage("kafka api listener: " + name + " missed message for key: " + key, record));
             }
@@ -77,11 +67,12 @@ public abstract class KafkaListener implements Runnable {
     }
   }
 
-  private Function<ConsumerRecord<String,String>, Boolean> getTopicMappedMethodExecutor(String key) {
+  private Function<ConsumerRecord<String, String>, Boolean> getTopicMappedMethodExecutor(String key) {
     if ((keyHandlerMap.size() == 1) && (keyHandlerMap.get("") != null)) {
       return keyHandlerMap.get("");
     }
     return keyHandlerMap.get(key);
   }
+
 
 }

@@ -5,7 +5,6 @@ import kafka.kafkaListener.KafkaListener;
 import kafka.kafkaListener.ListenerContainer;
 import kafka.kafkaListener.annotation.KafkaMapping;
 import kafka.kafkaListener.handler.MessageHandler;
-import kafka.kafkaListener.task.KafkaMessageProcessTask;
 import kafka.util.LogMessage;
 import lombok.extern.log4j.Log4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -16,12 +15,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Properties;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Configuration
@@ -69,30 +65,8 @@ public class KafkaApiConsumerInitializer {
 
   @Bean
   @Scope("prototype")
-  public KafkaMessageProcessTask kafkaMessageProcessTask() {
-    return new KafkaMessageProcessTask();
-  }
-
-  @Bean
-  @Scope("prototype")
   public KafkaListener kafkaListener() {
-    return new KafkaListener() {
-      @Override
-      public KafkaMessageProcessTask getKafkaMessageProcessTask(
-          ConsumerRecord<String, String> record,
-          String submittedByListenerName,
-          Function<ConsumerRecord<String, String>, Boolean> topicMappedMethodExecutor,
-          Consumer onSuccess,
-          Consumer onError) {
-        KafkaMessageProcessTask kafkaMessageProcessTask = kafkaMessageProcessTask();
-        kafkaMessageProcessTask.setRecord(record);
-        kafkaMessageProcessTask.setListenerName(submittedByListenerName);
-        kafkaMessageProcessTask.setTopicMappedMethodExecutor(topicMappedMethodExecutor);
-        kafkaMessageProcessTask.setOnSuccess(onSuccess);
-        kafkaMessageProcessTask.setOnError(onError);
-        return kafkaMessageProcessTask;
-      }
-    };
+    return new KafkaListener();
   }
 
   @Bean

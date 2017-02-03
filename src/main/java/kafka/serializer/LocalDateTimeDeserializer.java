@@ -10,14 +10,14 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
-    @Override
-    public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-        String str = jsonParser.readValueAsTree().toString().replaceAll("\"", "");
-        str= str.replaceAll("\\s","T");
-        if (str.endsWith("Z")) {
-            return ZonedDateTime.parse(str).toLocalDateTime();
-        } else {
-            return LocalDateTime.parse(str);
-        }
+  @Override
+  public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    String str = jsonParser.readValueAsTree().toString().replaceAll("\"", "");
+    str = str.replaceAll("\\s", "T");
+    if (str.endsWith("Z")) {
+      return ZonedDateTime.parse(str).toLocalDateTime();
+    } else {
+      return LocalDateTime.parse(str);
     }
+  }
 }
