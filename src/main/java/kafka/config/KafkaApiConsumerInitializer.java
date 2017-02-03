@@ -20,7 +20,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Configuration
 @PropertySource(value = {"classpath:/kafkaJob.properties"})
@@ -29,7 +31,9 @@ public class KafkaApiConsumerInitializer {
 
   @PostConstruct
   public void init() throws IllegalKeyMappingMethodException {
-    Method[] methods = MessageHandler.class.getDeclaredMethods();
+    MessageHandler messageHandler = messageHandler();
+    /**/
+    Method[] methods = messageHandler.getClass().getDeclaredMethods();
     ListenerContainer listenerContainer = listenerContainer();
     for (Method method : methods) {
       if (method.isAnnotationPresent(KafkaMapping.class)) {
@@ -38,13 +42,14 @@ public class KafkaApiConsumerInitializer {
             kafkaMapping.topic(),
             kafkaMapping.key(),
             kafkaMapping.listenerName(),
-            new Consumer<ConsumerRecord<String, String>>() {
+            new Function<ConsumerRecord<String, String>, Boolean>() {
               @Override
-              public void accept(ConsumerRecord<String, String> record) {
+              public Boolean apply(ConsumerRecord<String, String> record) {
                 try {
-                  method.invoke(this, method.getName(), record);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                  e.printStackTrace();
+                  method.invoke(messageHandler, method.getName(), record);
+                  return true;
+                } catch (Exception e) {
+                  return false;
                 }
               }
             });
@@ -55,6 +60,11 @@ public class KafkaApiConsumerInitializer {
       log.debug(LogMessage.logMessage("bind listener for", kafkaListener.getTopic()));
       listenerContainer.getKafkaListenerExecutor().submit(kafkaListener);
     }
+  }
+
+  @Bean
+  public MessageHandler messageHandler() {
+    return new MessageHandler();
   }
 
   @Bean
@@ -71,11 +81,15 @@ public class KafkaApiConsumerInitializer {
       public KafkaMessageProcessTask getKafkaMessageProcessTask(
           ConsumerRecord<String, String> record,
           String submittedByListenerName,
-          Consumer<ConsumerRecord<String, String>> topicMappedMethodExecutor) {
+          Function<ConsumerRecord<String, String>, Boolean> topicMappedMethodExecutor,
+          Consumer onSuccess,
+          Consumer onError) {
         KafkaMessageProcessTask kafkaMessageProcessTask = kafkaMessageProcessTask();
         kafkaMessageProcessTask.setRecord(record);
         kafkaMessageProcessTask.setListenerName(submittedByListenerName);
         kafkaMessageProcessTask.setTopicMappedMethodExecutor(topicMappedMethodExecutor);
+        kafkaMessageProcessTask.setOnSuccess(onSuccess);
+        kafkaMessageProcessTask.setOnError(onError);
         return kafkaMessageProcessTask;
       }
     };

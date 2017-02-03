@@ -21,6 +21,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Component
 @Getter
@@ -73,7 +74,7 @@ public abstract class ListenerContainer {
       String topic,
       String key,
       String listenerName,
-      Consumer<ConsumerRecord<String, String>> executor) throws IllegalKeyMappingMethodException {
+      Function<ConsumerRecord<String, String>, Boolean> executor) throws IllegalKeyMappingMethodException {
     KafkaListener kafkaListener = listenerList.get(topic);
     if (kafkaListener == null) {
       KafkaConsumer kafkaConsumer = new KafkaConsumer<>(consumerProperties);

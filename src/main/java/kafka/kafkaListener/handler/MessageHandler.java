@@ -35,6 +35,7 @@ public class MessageHandler {
     String topic = record.topic();
     String key = record.key();
     String value = record.value();
+//    float s = 1/0;
     log.debug("\n\texecuting method: " + methodName + " for topic: " + topic + " for key " + key + " for message: " + value);
     Thread.sleep(6000);
   }
